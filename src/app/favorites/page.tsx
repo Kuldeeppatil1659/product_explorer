@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { getProducts } from "@/lib/api";
 import FavoritesGrid from "@/components/products/FavoritesGrid";
 
