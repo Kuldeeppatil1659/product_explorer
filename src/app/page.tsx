@@ -1,21 +1,38 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0; 
+"use client"; 
 
-import ProductExplorer from "@/components/products/ProductExplorer";
-import { getProducts, getCategories } from "@/lib/api";
-import { Category, Product } from "@/lib/types";
+import { useEffect, useState } from 'react';
+import ProductExplorer from '@/components/products/ProductExplorer';
+import { Product, Category } from '@/lib/types';
+import { getProducts, getCategories } from '@/lib/api';
+import Loading from './loading';
 
-export default async function HomePage() {
-  let products: Product[] = [];
-  let categories: Category[] = [];
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setLoading] = useState(true);
 
-  try {
-    [products, categories] = await Promise.all([
-      getProducts(),
-      getCategories(),
-    ]);
-  } catch (err) {
-    console.error("API fetch error:", err);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [prodData, catData] = await Promise.all([
+          getProducts(),
+          getCategories()
+        ]);
+        
+        setProducts(prodData);
+        setCategories(catData);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (

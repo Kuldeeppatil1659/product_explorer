@@ -1,15 +1,33 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+"use client";
 
-import { getProducts } from "@/lib/api";
+import { useEffect, useState } from "react";
 import FavoritesGrid from "@/components/products/FavoritesGrid";
+import { Product } from "@/lib/types";
+import { getProducts } from "@/lib/api"; 
+import Loading from "../loading";
 
-export const metadata = {
-  title: 'My Favorites | StoreApp',
-};
+export default function FavoritesPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function FavoritesPage() {
-  const products = await getProducts();
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getProducts(); 
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to load favorites data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <main className="container mx-auto p-4 py-8">
